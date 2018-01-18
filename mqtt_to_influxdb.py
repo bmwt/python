@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+
+# note- required lib version 1.2.something, not 1.3
 import paho.mqtt.client as mqtt
 import datetime
 import time
@@ -46,7 +48,6 @@ connOK=False
 brokerid="10.5.0.125"
 while(connOK == False):
     try:
-#        client.connect("10.5.0.125", 1883, 60)
         client.connect(brokerid)
         connOK = True
     except:
