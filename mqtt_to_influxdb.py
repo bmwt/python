@@ -2,6 +2,7 @@
 
 # note- required lib version 1.2.something, not 1.3
 import paho.mqtt.client as mqtt
+import configparser
 import datetime
 import time
 from influxdb import InfluxDBClient
@@ -37,18 +38,21 @@ def on_message(client, userdata, msg):
 
         dbclient.write_points(json_body)
 
+# grab config
+config = configparser.ConfigParser()
+config.read('/etc/mqtt_to_influxdb.conf')
+
 # Set up a client for InfluxDB
-dbclient = InfluxDBClient('127.0.0.1', 8086, 'mqtt', 'hailbrak', 'sensordata')
+dbclient = InfluxDBClient(config['DEFAULT']['influxdb_host'], 8086, 'mqtt', config['DEFAULT']['influxdb_pwd'], config['DEFAULT']['influxdb_db'])
 
 # Initialize the MQTT client that should connect to the Mosquitto broker
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
 connOK=False
-brokerid="10.5.0.125"
 while(connOK == False):
     try:
-        client.connect(brokerid)
+        client.connect(config['DEFAULT']['mqtt_host'])
         connOK = True
     except:
         connOK = False
